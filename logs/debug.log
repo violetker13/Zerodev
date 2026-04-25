@@ -1,0 +1,111 @@
+[00:06:36] [main/INFO] (ViaProxy) Initializing ViaProxy CLI v3.4.10 (git-ViaProxy-3.4.10:5a4ce9c) (Injected using Launcher Agent)...
+[00:06:36] [main/INFO] (ViaProxy) Using java version: OpenJDK 64-Bit Server VM 21.0.9 (Ubuntu) on Linux
+[00:06:36] [main/INFO] (ViaProxy) Available memory (bytes): 4114612224
+[00:06:36] [main/INFO] (ViaProxy) Working directory: /home/mihail/IdeaProjects/minestome
+[00:06:36] [main/DEBUG] (io.netty.util.internal.logging.InternalLoggerFactory) Using SLF4J as the default logging framework
+[00:06:36] [main/DEBUG] (io.netty.util.ResourceLeakDetector) -Dio.netty.leakDetection.level: simple
+[00:06:36] [main/DEBUG] (io.netty.util.ResourceLeakDetector) -Dio.netty.leakDetection.targetRecords: 4
+[00:06:36] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) Java version: 21
+[00:06:36] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) -Dio.netty.noUnsafe: false
+[00:06:36] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) sun.misc.Unsafe.theUnsafe: available
+[00:06:36] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) sun.misc.Unsafe base methods: all available
+[00:06:36] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) java.nio.Buffer.address: available
+[00:06:36] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) direct buffer constructor: unavailable
+java.lang.UnsupportedOperationException: Reflective setAccessible(true) disabled
+	at io.netty.util.internal.ReflectionUtil.trySetAccessible(ReflectionUtil.java:36)
+	at io.netty.util.internal.PlatformDependent0$4.run(PlatformDependent0.java:293)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:319)
+	at io.netty.util.internal.PlatformDependent0.<clinit>(PlatformDependent0.java:285)
+	at io.netty.util.internal.PlatformDependent.isAndroid(PlatformDependent.java:385)
+	at io.netty.util.internal.PlatformDependent.<clinit>(PlatformDependent.java:94)
+	at net.raphimc.viaproxy.ViaProxy.loadNetty(ViaProxy.java:315)
+	at net.raphimc.viaproxy.ViaProxy.injectedMain(ViaProxy.java:213)
+	at net.raphimc.viaproxy.ViaProxy.main(ViaProxy.java:102)
+[00:06:36] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) java.nio.Bits.unaligned: available, true
+[00:06:36] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) jdk.internal.misc.Unsafe.allocateUninitializedArray(int): unavailable
+java.lang.IllegalAccessException: symbolic reference class is not accessible: class jdk.internal.misc.Unsafe, from class io.netty.util.internal.PlatformDependent0 (unnamed module @3c0f93f1)
+	at java.base/java.lang.invoke.MemberName.makeAccessException(MemberName.java:894)
+	at java.base/java.lang.invoke.MethodHandles$Lookup.checkSymbolicClass(MethodHandles.java:3787)
+	at java.base/java.lang.invoke.MethodHandles$Lookup.resolveOrFail(MethodHandles.java:3747)
+	at java.base/java.lang.invoke.MethodHandles$Lookup.findStatic(MethodHandles.java:2675)
+	at io.netty.util.internal.PlatformDependent0$6.run(PlatformDependent0.java:417)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:319)
+	at io.netty.util.internal.PlatformDependent0.<clinit>(PlatformDependent0.java:409)
+	at io.netty.util.internal.PlatformDependent.isAndroid(PlatformDependent.java:385)
+	at io.netty.util.internal.PlatformDependent.<clinit>(PlatformDependent.java:94)
+	at net.raphimc.viaproxy.ViaProxy.loadNetty(ViaProxy.java:315)
+	at net.raphimc.viaproxy.ViaProxy.injectedMain(ViaProxy.java:213)
+	at net.raphimc.viaproxy.ViaProxy.main(ViaProxy.java:102)
+[00:06:36] [main/DEBUG] (io.netty.util.internal.PlatformDependent0) java.nio.DirectByteBuffer.<init>(long, {int,long}): unavailable
+[00:06:36] [main/DEBUG] (io.netty.util.internal.PlatformDependent) sun.misc.Unsafe: available
+[00:06:36] [main/DEBUG] (io.netty.util.internal.PlatformDependent) -Dio.netty.tmpdir: /tmp (java.io.tmpdir)
+[00:06:36] [main/DEBUG] (io.netty.util.internal.PlatformDependent) -Dio.netty.bitMode: 64 (sun.arch.data.model)
+[00:06:36] [main/DEBUG] (io.netty.util.internal.PlatformDependent) -Dio.netty.maxDirectMemory: -1 bytes
+[00:06:36] [main/DEBUG] (io.netty.util.internal.CleanerJava9) java.nio.ByteBuffer.cleaner(): available
+[00:06:36] [main/DEBUG] (io.netty.util.internal.PlatformDependent) -Dio.netty.noPreferDirect: false
+[00:06:36] [main/DEBUG] (io.netty.util.internal.PlatformDependent) -Dio.netty.jfr.enabled: true
+[00:06:36] [main/DEBUG] (io.netty.util.concurrent.GlobalEventExecutor) -Dio.netty.globalEventExecutor.quietPeriodSeconds: 1
+[00:06:36] [main/DEBUG] (io.netty.util.internal.InternalThreadLocalMap) -Dio.netty.threadLocalMap.stringBuilder.initialSize: 1024
+[00:06:36] [main/DEBUG] (io.netty.util.internal.InternalThreadLocalMap) -Dio.netty.threadLocalMap.stringBuilder.maxSize: 4096
+[00:06:37] [Via-Mappingloader-1/INFO] (ViaVersion) Loading block connection mappings ...
+[00:06:37] [main/INFO] (ViaBackwards) Loading translations...
+[00:06:37] [main/INFO] (ViaBackwards) Registering protocols...
+[00:06:38] [main/INFO] (ViaRewind) Registering protocols...
+[00:06:38] [main/DEBUG] (io.netty.channel.MultithreadEventLoopGroup) -Dio.netty.eventLoopThreads: 8
+[00:06:38] [main/DEBUG] (io.netty.channel.nio.NioIoHandler) -Dio.netty.noKeySetOptimization: false
+[00:06:38] [main/DEBUG] (io.netty.channel.nio.NioIoHandler) -Dio.netty.selectorAutoRebuildThreshold: 512
+[00:06:38] [main/DEBUG] (io.netty.util.internal.PlatformDependent) org.jctools-core.MpscChunkedArrayQueue: available
+[00:06:38] [main/DEBUG] (io.netty.channel.DefaultChannelId) -Dio.netty.processId: 514132 (auto-detected)
+[00:06:38] [main/DEBUG] (io.netty.util.NetUtil) -Djava.net.preferIPv4Stack: false
+[00:06:38] [main/DEBUG] (io.netty.util.NetUtil) -Djava.net.preferIPv6Addresses: false
+[00:06:38] [main/DEBUG] (io.netty.util.NetUtilInitializations) Loopback interface: lo (lo, 0:0:0:0:0:0:0:1%lo)
+[00:06:38] [main/DEBUG] (io.netty.util.NetUtil) /proc/sys/net/core/somaxconn: 4096
+[00:06:38] [main/DEBUG] (io.netty.channel.DefaultChannelId) -Dio.netty.machineId: 10:68:38:ff:fe:de:2a:fb (auto-detected)
+[00:06:38] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.numHeapArenas: 8
+[00:06:38] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.numDirectArenas: 8
+[00:06:38] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.pageSize: 8192
+[00:06:38] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.maxOrder: 9
+[00:06:38] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.chunkSize: 4194304
+[00:06:38] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.smallCacheSize: 256
+[00:06:38] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.normalCacheSize: 64
+[00:06:38] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.maxCachedBufferCapacity: 32768
+[00:06:38] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.cacheTrimInterval: 8192
+[00:06:38] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.cacheTrimIntervalMillis: 0
+[00:06:38] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.useCacheForAllThreads: false
+[00:06:38] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.maxCachedByteBuffersPerChunk: 1023
+[00:06:38] [main/DEBUG] (io.netty.buffer.PooledByteBufAllocator) -Dio.netty.allocator.disableCacheFinalizersForFastThreadLocalThreads: false
+[00:06:38] [main/DEBUG] (io.netty.buffer.ByteBufUtil) -Dio.netty.allocator.type: pooled
+[00:06:38] [main/DEBUG] (io.netty.buffer.ByteBufUtil) -Dio.netty.threadLocalDirectBufferSize: 0
+[00:06:38] [main/DEBUG] (io.netty.buffer.ByteBufUtil) -Dio.netty.maxThreadLocalCharBufferSize: 16384
+[00:06:38] [main/DEBUG] (io.netty.bootstrap.ChannelInitializerExtensions) -Dio.netty.bootstrap.extensions: null
+[00:06:38] [main/INFO] (ViaBedrock) Started resource pack HTTP server on http://127.0.0.1:43627/
+[00:06:38] [main/INFO] (ViaVersion) ViaVersion detected lowest supported version by the proxy: 1.7.2-1.7.5 (4)
+[00:06:38] [main/INFO] (ViaVersion) Highest supported version by the proxy: 26.1 (775)
+[00:06:39] [main/INFO] (ViaProxy) ViaProxy started successfully!
+[00:06:39] [main/INFO] (ViaProxy) Starting proxy server
+[00:06:39] [main/INFO] (ViaProxy) Binding proxy server to 0.0.0.0:25566
+[00:06:39] [main/DEBUG] (io.netty.util.internal.NativeLibraryLoader) -Dio.netty.native.workdir: /tmp (io.netty.tmpdir)
+[00:06:39] [main/DEBUG] (io.netty.util.internal.NativeLibraryLoader) -Dio.netty.native.deleteLibAfterLoading: true
+[00:06:39] [main/DEBUG] (io.netty.util.internal.NativeLibraryLoader) -Dio.netty.native.tryPatchShadedId: true
+[00:06:39] [main/DEBUG] (io.netty.util.internal.NativeLibraryLoader) -Dio.netty.native.detectNativeLibraryDuplicates: true
+[00:06:39] [main/DEBUG] (io.netty.util.internal.NativeLibraryLoader) Successfully loaded the library /tmp/libnetty_transport_native_epoll_x86_649641217844774452921.so
+[00:06:39] [main/DEBUG] (io.netty.channel.kqueue.KQueue) KQueue support is not available
+java.lang.ExceptionInInitializerError
+	at io.netty.channel.kqueue.KQueue.<clinit>(KQueue.java:38)
+	at net.raphimc.netminecraft.util.TransportType.<clinit>(TransportType.java:42)
+	at net.raphimc.netminecraft.netty.connection.NetServer.bind(NetServer.java:58)
+	at net.raphimc.viaproxy.ViaProxy.startProxy(ViaProxy.java:288)
+	at net.raphimc.viaproxy.ViaProxy.injectedMain(ViaProxy.java:273)
+	at net.raphimc.viaproxy.ViaProxy.main(ViaProxy.java:102)
+Caused by: java.lang.IllegalStateException: Only supported on OSX/BSD
+	at io.netty.channel.kqueue.Native.loadNativeLibrary(Native.java:159)
+	at io.netty.channel.kqueue.Native.<clinit>(Native.java:76)
+	... 6 more
+[00:06:39] [main/DEBUG] (io.netty.util.internal.NativeLibraryLoader) Successfully loaded the library /tmp/libnetty_transport_native_io_uring42_x86_6413395150439023023238.so
+[00:06:39] [main/DEBUG] (io.netty.channel.uring.IoUring) IoUring support is available using kernel 6.8.0-90-generic: CQE_F_SOCK_NONEMPTY_SUPPORTED=true, SPLICE_SUPPORTED=true, ACCEPT_NO_WAIT_SUPPORTED=false, ACCEPT_MULTISHOT_SUPPORTED=true, POLL_ADD_MULTISHOT_SUPPORTED=true, RECV_MULTISHOT_SUPPORTED=true, IORING_RECVSEND_BUNDLE_SUPPORTED=false, REGISTER_IOWQ_MAX_WORKERS_SUPPORTED=true, SETUP_SUBMIT_ALL_SUPPORTED=true, SETUP_CQE_MIXED_SUPPORTED=false, SETUP_CQ_SIZE_SUPPORTED=true, SETUP_SINGLE_ISSUER_SUPPORTED=true, SETUP_DEFER_TASKRUN_SUPPORTED=true, SETUP_NO_SQARRAY_SUPPORTED=true, REGISTER_BUFFER_RING_SUPPORTED=true, REGISTER_BUFFER_RING_INC_SUPPORTED=false, SEND_ZC_SUPPORTED=true, SENDMSG_ZC_SUPPORTED=true
+[00:06:39] [Via Async Task 1/WARN] (ViaVersion) There is a newer plugin version available: 5.9.0, you're on: 5.8.0
+[00:06:40] [Via-Mappingloader-4/DEBUG] (io.netty.buffer.AbstractByteBuf) -Dio.netty.buffer.checkAccessible: true
+[00:06:40] [Via-Mappingloader-4/DEBUG] (io.netty.buffer.AbstractByteBuf) -Dio.netty.buffer.checkBounds: true
+[00:06:40] [Via-Mappingloader-4/DEBUG] (io.netty.util.ResourceLeakDetectorFactory) Loaded default ResourceLeakDetector: io.netty.util.ResourceLeakDetector@3bc1415e
+[00:06:40] [Via Async Scheduler 0/INFO] (ViaVersion) Finished mapping loading, shutting down loader executor.
+[00:06:42] [Console-Handler/INFO] (ViaProxy) Stopping ViaProxy...

@@ -1,0 +1,46 @@
+plugins {
+    id 'java'
+    id 'com.gradleup.shadow' version "8.3.0"
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+
+}
+
+
+dependencies {
+    implementation('net.minestom:minestom:2026.04.13-1.21.11')
+    testImplementation("org.slf4j:slf4j-simple:2.0.16")
+    implementation 'de.articdive:jnoise-pipeline:4.0.0'
+    implementation 'org.reflections:reflections:0.10.2'
+}
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+    }
+}
+
+tasks {
+    jar {
+        manifest {
+            attributes["Main-Class"] = "org.example.Main" // поменяй на свой main класс
+        }
+    }
+
+    build {
+        dependsOn(shadowJar)
+    }
+
+    shadowJar {
+        mergeServiceFiles()
+        archiveClassifier.set("")
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
