@@ -23,5 +23,6 @@ public class PickupItemEventHandler extends EventHandler {
                 playerInventory.addItemStack(itemStack);
             }
         });
+
     }
 }

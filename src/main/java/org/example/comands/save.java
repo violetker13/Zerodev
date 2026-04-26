@@ -6,8 +6,8 @@ import net.minestom.server.command.builder.arguments.ArgumentEnum;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
+import org.example.extras.PlayerUtils;
 import org.jetbrains.annotations.NotNull;
-
 import static org.example.Main.instances;
 
 public class save extends Command {
@@ -16,13 +16,15 @@ public class save extends Command {
         setDefaultExecutor((sender, context) -> {
             sender.sendMessage(Component.text(": /save"));
         });
-
         addSyntax((sender, context) -> {
             if (!(sender instanceof Player player)) {
                 sender.sendMessage(Component.text("Только для игроков!"));
                 return;
             }
-            instances.forEach((id, uinst) -> {
+            if(!PlayerUtils.isAdmin(player)) {player.sendMessage("У тебя нет прав на эту команду!");return;}
+
+
+                instances.forEach((id, uinst) -> {
                 uinst.saveChunksToStorage().thenRun(() -> {
                     player.sendMessage(Component.text("Мир " + id + " сохранён"));
                 });

@@ -26,11 +26,10 @@ public class Utils {
     }
 
     public static String uploadPack(Path packFile) throws Exception {
-        final String TOKEN = "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";
+        final String TOKEN = "TOKEN";
         final String OWNER = "violetker13";
         final String REPO = "pack";
         final String TAG = "server-pack";
-
         HttpClient client = HttpClient.newHttpClient();
 
         // 1. Проверяем старый релиз

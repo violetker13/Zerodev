@@ -3,6 +3,7 @@ package org.example;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.entity.Player;
 import net.minestom.server.event.Event;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
@@ -18,8 +19,10 @@ import org.example.extras.Utils;
 import org.example.world.GenWorld;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class Main {
     public static EventNode<Event> node;
@@ -27,6 +30,9 @@ public class Main {
     public static Map<Integer, InstanceContainer> instances = new HashMap<>();
     public static Map<Integer, EventNode<InstanceEvent>> instanceNodes = new HashMap<>();
     public static MinecraftServer server;
+    public static ArrayList<String> ADMINS = new ArrayList<String>(){{
+        add("kaleb_b");
+    }};
     public static String packUrl = null;
     public static String packHash = null;
     public static void main(String[] args) {
