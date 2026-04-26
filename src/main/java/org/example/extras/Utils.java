@@ -26,7 +26,6 @@ public class Utils {
     }
 
     public static String uploadPack(Path packFile) throws Exception {
-        final String TOKEN = "TOKEN";
         final String OWNER = "violetker13";
         final String REPO = "pack";
         final String TAG = "server-pack";
@@ -35,7 +34,7 @@ public class Utils {
         // 1. Проверяем старый релиз
         HttpRequest getRelease = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.github.com/repos/" + OWNER + "/" + REPO + "/releases/tags/" + TAG))
-                .header("Authorization", "Bearer " + TOKEN)
+                .header("Authorization", "Bearer " + "TOKEN")
                 .GET()
                 .build();
 
@@ -48,12 +47,12 @@ public class Utils {
 
             client.send(HttpRequest.newBuilder()
                     .uri(URI.create("https://api.github.com/repos/" + OWNER + "/" + REPO + "/releases/" + oldId))
-                    .header("Authorization", "Bearer " + TOKEN)
+                    .header("Authorization", "Bearer " + "TOKEN")
                     .DELETE().build(), HttpResponse.BodyHandlers.ofString());
 
             client.send(HttpRequest.newBuilder()
                     .uri(URI.create("https://api.github.com/repos/" + OWNER + "/" + REPO + "/git/refs/tags/" + TAG))
-                    .header("Authorization", "Bearer " + TOKEN)
+                    .header("Authorization", "Bearer " + "TOKEN")
                     .DELETE().build(), HttpResponse.BodyHandlers.ofString());
 
             System.out.println("[Pack] Старый релиз удалён");
@@ -62,7 +61,7 @@ public class Utils {
         // 2. Создаём релиз
         HttpRequest createRelease = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.github.com/repos/" + OWNER + "/" + REPO + "/releases"))
-                .header("Authorization", "Bearer " + TOKEN)
+                .header("Authorization", "Bearer " + "TOKEN")
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString("""
                 {
@@ -94,7 +93,7 @@ public class Utils {
         HttpRequest uploadAsset = HttpRequest.newBuilder()
                 .uri(URI.create("https://uploads.github.com/repos/" + OWNER + "/" + REPO +
                         "/releases/" + releaseId + "/assets?name=pack.zip"))
-                .header("Authorization", "Bearer " + TOKEN)
+                .header("Authorization", "Bearer " + "TOKEN")
                 .header("Content-Type", "application/zip")
                 .POST(HttpRequest.BodyPublishers.ofByteArray(Files.readAllBytes(packFile)))
                 .build();
