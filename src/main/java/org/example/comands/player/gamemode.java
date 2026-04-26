@@ -1,4 +1,4 @@
-package org.example.comands;
+package org.example.comands.player;
 
 import net.kyori.adventure.text.Component;
 import net.minestom.server.command.builder.Command;
@@ -6,15 +6,13 @@ import net.minestom.server.command.builder.arguments.ArgumentEnum;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.player.PlayerInputEvent;
-import net.minestom.server.network.player.ClientSettings;
 import org.jetbrains.annotations.NotNull;
 
 public class gamemode extends Command {
 
 
     public gamemode() {
-        super("gamemode");
+        super("gamemode","gm");
 
         setDefaultExecutor((sender, context) -> {
             sender.sendMessage(Component.text("Использование: /gamemode <creative|survival|adventure|spectator>"));

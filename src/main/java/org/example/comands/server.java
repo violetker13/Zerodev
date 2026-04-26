@@ -67,6 +67,7 @@ public class server extends Command {
                     : player.getPosition()
             );
 
+
         }, arg);
     }
 }

@@ -1,4 +1,4 @@
-package org.example.comands;
+package org.example.comands.player;
 
 import net.kyori.adventure.text.Component;
 import net.minestom.server.command.builder.Command;
