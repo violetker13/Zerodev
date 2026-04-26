@@ -9,13 +9,16 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.instance.InstanceContainer;
 import org.example.Main;
 
+import static org.example.world.InstanceManager.getInstanceById;
+import static org.example.world.InstanceManager.getInstances;
+
 public class server extends Command {
     public server() {
         super("server");
 
         setDefaultExecutor((sender, context) -> {
             sender.sendMessage(Component.text("Доступные серверы:", NamedTextColor.GOLD));
-            Main.instances.forEach((id, inst) -> {
+            getInstances().forEach((id, inst) -> {
                 int players = inst.getPlayers().size();
                 sender.sendMessage(Component.text(
                         "  #" + id + " — " + players + " игроков",
@@ -28,7 +31,7 @@ public class server extends Command {
         var arg = ArgumentType.Integer("id");
 
         arg.setSuggestionCallback((sender, context, suggestion) -> {
-            Main.instances.forEach((id, inst) -> {
+            getInstances().forEach((id, inst) -> {
                 int players = inst.getPlayers().size();
                 suggestion.addEntry(new SuggestionEntry(
                         String.valueOf(id),
@@ -43,7 +46,7 @@ public class server extends Command {
             }
 
             int id = context.get(arg);
-            InstanceContainer target = Main.getInstanceById(id);
+            InstanceContainer target = getInstanceById(id);
 
             if (target == null) {
                 player.sendMessage(Component.text(

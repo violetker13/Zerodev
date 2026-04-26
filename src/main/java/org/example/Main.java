@@ -4,105 +4,69 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.PlayerSkin;
 import net.minestom.server.event.Event;
-import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
-import net.minestom.server.event.trait.InstanceEvent;
-import net.minestom.server.instance.Chunk;
-import net.minestom.server.instance.InstanceContainer;
-import net.minestom.server.instance.WorldBorder;
-import net.minestom.server.instance.anvil.AnvilLoader;
-import net.minestom.server.instance.block.Block;
-import net.minestom.server.utils.time.TimeUnit;
+import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
+import org.example.database.DatabaseManager;
 import org.example.extras.AutoRegister;
 import org.example.extras.Utils;
-import org.example.world.GenWorld;
+import org.example.world.InstanceManager;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 public class Main {
-    public static EventNode<Event> node;
-    public static InstanceContainer instance;
-    public static Map<Integer, InstanceContainer> instances = new HashMap<>();
-    public static Map<Integer, EventNode<InstanceEvent>> instanceNodes = new HashMap<>();
     public static MinecraftServer server;
-    public static ArrayList<String> ADMINS = new ArrayList<String>(){{
-        add("kaleb_b");
-    }};
+    public static EventNode<Event> node;
+
+    public static final ArrayList<String> ADMINS = new ArrayList<>() {{ add("kaleb_b"); }};
     public static String packUrl = null;
     public static String packHash = null;
+
     public static void main(String[] args) {
         server = MinecraftServer.init();
+        initSystems();
+        start(args);
+    }
 
-        // Загружаем пак ОДИН РАЗ при старте
+    private static void initSystems() {
+        // БД
         try {
-            packUrl = Utils.uploadPack(Path.of("resourcepack/pack.zip"));
-            packHash = Utils.sha1Hash(Path.of("resourcepack/pack.zip"));
+            DatabaseManager.init();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        // Ресурспак
+        try {
+            Path packPath = Path.of("resourcepack/pack.zip");
+            packUrl = Utils.uploadPack(packPath);
+            packHash = Utils.sha1Hash(packPath);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-
-        start(args);
+        // Неизвестные команды
+        MinecraftServer.getCommandManager().setUnknownCommandCallback((sender, command) -> {
+            sender.sendMessage(Component.text("Команда /" + command + " не найдена!", NamedTextColor.RED));
+        });
     }
 
     public static void start(String[] args) {
         node = EventNode.all("global");
         MinecraftServer.getGlobalEventHandler().addChild(node);
 
-        var instanceManager = MinecraftServer.getInstanceManager();
+        // Авто-скины
 
-        int count = 2;
-        if (args != null && args.length > 0) {
-            try {
-                count = Math.max(1, Integer.parseInt(args[0]));
-            } catch (NumberFormatException ignored) {}
-        }
+        // Работа с инстансами через менеджер
+        InstanceManager.setupInstances(args);
 
-        for (int i = 1; i <= count; i++) {
-            InstanceContainer inst = instanceManager.createInstanceContainer();
-            inst.setChunkLoader(new AnvilLoader("worlds/world_" + i)); // указываем папку
-            instances.put(i, inst);
-            GenWorld.init(inst);
-            // Центр 0,0 размер 128
-            inst.setTime(0);
-            inst.setWorldBorder(WorldBorder.DEFAULT_BORDER.withDiameter(128));
-            final InstanceContainer finalInst = inst;
-            EventNode<InstanceEvent> instanceNode = EventNode.type(
-                    "instance-node-" + i,
-                    EventFilter.INSTANCE,
-                    (event, instance) -> instance.equals(finalInst)
-            );
-
-            instanceNodes.put(i, instanceNode);
-            node.addChild(instanceNode);
-            AutoRegister.registerInstanceEvents(instanceNode, inst, "org.example.events.handlers");
-
-            System.out.println("Инстанс " + i + " создан");
-        }
-
-        instance = instances.get(1);
-        AutoRegister.registerEvents(node, instance, "org.example.events.global");
+        // Регистрация
+        AutoRegister.registerEvents(node, InstanceManager.getInstanceById(1), "org.example.events.global");
         AutoRegister.registerCommands("org.example.comands");
 
-        MinecraftServer.getCommandManager().setUnknownCommandCallback((sender, command) -> {
-            sender.sendMessage(Component.text(
-                    "Команда /" + command + " не найдена!",
-                    NamedTextColor.RED
-            ));
-        });
         server.start("0.0.0.0", 20000);
-    }
-
-    public static InstanceContainer getInstanceById(int id) {
-        return instances.get(id);
-    }
-
-    public static EventNode<InstanceEvent> getNodeByInstanceId(int id) {
-        return instanceNodes.get(id);
     }
 }

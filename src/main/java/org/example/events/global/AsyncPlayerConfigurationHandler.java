@@ -7,6 +7,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.PlayerSkin;
 import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
@@ -14,6 +15,7 @@ import net.minestom.server.event.player.AsyncPlayerPreLoginEvent;
 import net.minestom.server.event.server.ServerTickMonitorEvent;
 import net.minestom.server.instance.InstanceContainer;
 import org.example.Main;
+import org.example.database.DatabaseManager;
 import org.example.events.EventHandler;
 import org.example.extras.Utils;
 
@@ -37,9 +39,7 @@ public class AsyncPlayerConfigurationHandler extends EventHandler {
 
             final Player player = event.getPlayer();
             event.getPlayer().setGameMode(GameMode.SURVIVAL);
-
             event.setSpawningInstance(instance);
-
             player.setRespawnPoint(new Pos(5, 45, 5, 0, 0));
             LoadResourcePack(player);
 

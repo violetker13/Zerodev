@@ -6,7 +6,6 @@ import net.minestom.server.event.player.PlayerChatEvent;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.SharedInstance;
 import org.example.events.EventHandler;
-import org.example.extras.actions.Test1;
 
 import java.util.UUID;
 

@@ -14,9 +14,12 @@ repositories {
 
 dependencies {
     implementation('net.minestom:minestom:2026.04.13-1.21.11')
-    testImplementation("org.slf4j:slf4j-simple:2.0.16")
+    implementation 'org.slf4j:slf4j-simple:2.0.16'
     implementation 'de.articdive:jnoise-pipeline:4.0.0'
     implementation 'org.reflections:reflections:0.10.2'
+    implementation 'org.xerial:sqlite-jdbc:3.45.2.0'
+    implementation 'com.zaxxer:HikariCP:5.1.0'
+
 }
 java {
     toolchain {
@@ -43,4 +46,10 @@ tasks {
 
 test {
     useJUnitPlatform()
+}
+tasks.withType(JavaExec).configureEach {
+    jvmArgs += [
+            '--enable-native-access=ALL-UNNAMED',
+            '-Dorg.slf4j.simpleLogger.defaultLogLevel=info'
+    ]
 }
