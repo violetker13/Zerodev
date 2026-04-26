@@ -1,4 +1,4 @@
-package org.example.events.handlers;
+package org.example.events.global;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

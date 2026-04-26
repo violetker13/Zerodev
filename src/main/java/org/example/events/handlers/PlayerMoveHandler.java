@@ -19,7 +19,7 @@ public class PlayerMoveHandler extends EventHandler { // ← переимену�
                 event.getPlayer().teleport(newPos.add(0, 100, 0));
 
             }
-            event.getPlayer().sendActionBar(Component.text(newPos.toString()));
+           // event.getPlayer().sendActionBar(Component.text(newPos.toString()));
         });
     }
 }
