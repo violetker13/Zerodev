@@ -5,23 +5,29 @@ import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.PlayerSkin;
+import net.minestom.server.entity.metadata.avatar.PlayerMeta;
+import net.minestom.server.network.NetworkBuffer;
 import org.example.api.zero_command.ZeroCommand;
 import org.example.database.DatabaseManager;
 import org.example.extras.PlayerUtils;
+
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
 
 public class skin extends Command implements ZeroCommand {
 
     public skin() {
         super("skin", "скин","zero-skin");
-        setUsage("/skin <set/info> <url>");
+        setUsage("/skin <set> <player>");
         var setLiteral = ArgumentType.Literal("set");
-        var urlArg = ArgumentType.String("url");
+        var urlArg = ArgumentType.String("player");
 
-        addAdminSyntax((player, context) -> {
+        addPlayerSyntax((player, context) -> {
             String targetNick = context.get(urlArg);
             Thread.startVirtualThread(() -> {
                 PlayerSkin skin = PlayerSkin.fromUsername(targetNick);
+                SocketAddress remote = player.getPlayerConnection().getRemoteAddress();
 
                 if (skin != null) {
                     DatabaseManager.saveSkin(player.getUuid(), targetNick);

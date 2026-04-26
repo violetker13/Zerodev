@@ -31,7 +31,6 @@ public class AutoRegister {
             try {
                 EventHandler handler = clazz.getDeclaredConstructor().newInstance();
                 handler.register((EventNode<Event>) node, instance);
-                System.out.println("Зарегистрировано: " + clazz.getSimpleName());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -46,7 +45,6 @@ public class AutoRegister {
             try {
                 Command command = commandClass.getDeclaredConstructor().newInstance();
                 MinecraftServer.getCommandManager().register(command);
-                System.out.println("Зарегистрирована команда: " + commandClass.getSimpleName());
             } catch (Exception e) {
                 e.printStackTrace();
             }

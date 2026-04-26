@@ -7,6 +7,7 @@ import net.minestom.server.entity.Player;
 import org.example.Main;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -23,12 +24,9 @@ public class PlayerUtils {
     // MinecraftServer.TICK_MS
 
     //возвращает сет всех игроков на СЕРВЕРЕ!
-    public static Set<Player> getAllPlayers() {
-        Set<Player> players = new HashSet<Player>();
-        MinecraftServer.getInstanceManager().getInstances().forEach(instance -> {
-            players.addAll(instance.getPlayers());
-        });
-        return players;
+    public static Collection<Player> getAllPlayers() {
+        return server.getConnectionManager().getOnlinePlayers();
+
 
     }
 
@@ -37,4 +35,7 @@ public class PlayerUtils {
         if (Main.packUrl != null) {player.sendResourcePacks(ResourcePackRequest.resourcePackRequest().packs(ResourcePackInfo.resourcePackInfo().id(UUID.fromString("550e8400-e29b-41d4-a716-446655440000")).uri(URI.create(Main.packUrl)).hash(Main.packHash).build()).required(false).build());
         }
     }
+
+
+
 }

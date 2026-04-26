@@ -42,7 +42,7 @@ public class Main {
         // Ресурспак
         try {
             Path packPath = Path.of("resourcepack/pack.zip");
-            packUrl = Utils.uploadPack(packPath);
+            //packUrl = Utils.uploadPack(packPath);
             packHash = Utils.sha1Hash(packPath);
         } catch (Exception e) {
             e.printStackTrace();

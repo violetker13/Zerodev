@@ -1,9 +1,9 @@
 package org.example.extras;
 
-import com.sun.net.httpserver.HttpServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -122,6 +122,47 @@ public class Utils {
             sb.append(String.format("%02x", b));
         }
         return sb.toString();
+    }
+    public static Component ColorizeText(String text) {
+        Component result = Component.empty();
+        String[] parts = text.split("&");
+
+        for (int i = 0; i < parts.length; i++) {
+            if (i == 0) {
+                result = result.append(Component.text(parts[i]));
+                continue;
+            }
+            if (parts[i].isEmpty()) continue;
+
+            char code = parts[i].charAt(0);
+            String rest = parts[i].substring(1);
+            TextColor color = switch (code) {
+                case '0' -> NamedTextColor.BLACK;
+                case '1' -> NamedTextColor.DARK_BLUE;
+                case '2' -> NamedTextColor.DARK_GREEN;
+                case '3' -> NamedTextColor.DARK_AQUA;
+                case '4' -> NamedTextColor.DARK_RED;
+                case '5' -> NamedTextColor.DARK_PURPLE;
+                case '6' -> NamedTextColor.GOLD;
+                case '7' -> NamedTextColor.GRAY;
+                case '8' -> NamedTextColor.DARK_GRAY;
+                case '9' -> NamedTextColor.BLUE;
+                case 'a' -> NamedTextColor.GREEN;
+                case 'b' -> NamedTextColor.AQUA;
+                case 'c' -> NamedTextColor.RED;
+                case 'd' -> NamedTextColor.LIGHT_PURPLE;
+                case 'e' -> NamedTextColor.YELLOW;
+                case 'f' -> NamedTextColor.WHITE;
+                default -> null;
+            };
+
+            if (color != null) {
+                result = result.append(Component.text(rest, color));
+            } else {
+                result = result.append(Component.text("&" + parts[i]));
+            }
+        }
+        return result;
     }
 
 
