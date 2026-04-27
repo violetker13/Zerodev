@@ -11,7 +11,7 @@ public class GenWorld {
 
        for(int i = 0; i < 32; i++) {
            for(int j = 0; j < 32; j++) {
-              // instance.setBlock(i, 40, j, Block.GRASS_BLOCK);
+               instance.setBlock(i, 40, j, Block.GRASS_BLOCK);
            }
        }
 

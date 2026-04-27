@@ -9,6 +9,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.entity.metadata.display.TextDisplayMeta;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
+import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.trait.PlayerEvent;
 import org.example.Main;
@@ -17,9 +18,10 @@ public class Cursor {
     private final Player player;
     private Entity cameraEntity;  // заморозка камеры
     private Entity dotEntity;     // точка курсора
-    private EventNode<PlayerEvent> playerNode;
     private GameMode originalGameMode;
     private boolean active = false;
+    private net.minestom.server.event.EventListener<PlayerMoveEvent> moveListener;
+    private net.minestom.server.event.EventListener<PlayerDisconnectEvent> disconnectListener;
 
     // Центральная точка (куда смотрел игрок при активации)
     private float centerYaw;
@@ -35,40 +37,36 @@ public class Cursor {
 
         player.setGameMode(GameMode.SPECTATOR);
 
-        // Запоминаем центр — текущий взгляд игрока
+        // Запоминаем центр
         centerYaw = player.getPosition().yaw();
         centerPitch = player.getPosition().pitch();
 
         Pos spawnPos = player.getPosition().add(0, 1.6, 0);
 
-        // 1. Сущность для заморозки камеры
+        // 1. Заморозка камеры
         cameraEntity = new Entity(EntityType.ITEM_DISPLAY);
         cameraEntity.setNoGravity(true);
         cameraEntity.setInstance(player.getInstance(), spawnPos);
         cameraEntity.addPassenger(player);
-        player.spectate(cameraEntity); // камера заморожена
+        player.spectate(cameraEntity);
 
-        // 2. Точка курсора TEXT_DISPLAY
+        // 2. Точка курсора
         dotEntity = new Entity(EntityType.TEXT_DISPLAY);
         dotEntity.setNoGravity(true);
-
         TextDisplayMeta meta = (TextDisplayMeta) dotEntity.getEntityMeta();
         meta.setText(Component.text("•"));
         meta.setBillboardRenderConstraints(TextDisplayMeta.BillboardConstraints.CENTER);
-        meta.setPosRotInterpolationDuration(1);
         meta.setSeeThrough(true);
         meta.setBackgroundColor(0);
         dotEntity.setInstance(player.getInstance(), calcDotPos(centerYaw, centerPitch));
-
-        // Нода только для этого игрока
-        playerNode = EventNode.type(
-                "cursor-node-" + player.getUuid(),
-                EventFilter.PLAYER,
-                (event, p) -> p.equals(player)
-        );
-
-        playerNode.addListener(PlayerMoveEvent.class, this::onMove);
-        Main.node.addChild(playerNode);
+        moveListener = net.minestom.server.event.EventListener.builder(PlayerMoveEvent.class)
+                .handler(this::onMove)
+                .build();
+        disconnectListener = net.minestom.server.event.EventListener.builder(PlayerDisconnectEvent.class)
+                .handler(event -> remove())
+                .build();
+        player.eventNode().addListener(moveListener);
+        player.eventNode().addListener(disconnectListener);
 
         active = true;
         return this;
@@ -77,8 +75,22 @@ public class Cursor {
     public void remove() {
         if (!active) return;
 
-        player.stopSpectating();
-        player.setGameMode(originalGameMode);
+        // Очищаем слушатели с игрока, чтобы они не копились, если он включит курсор снова
+        // Но так как Minestom не дает легко удалить конкретный листенер без Handle,
+        // проще всего привязать жизненный цикл курсора к сущностям.
+
+        // Удаляем конкретные слушатели, чтобы они не дублировались при следующем включении
+        if (moveListener != null) {
+            player.eventNode().removeListener(moveListener);
+        }
+        if (disconnectListener != null) {
+            player.eventNode().removeListener(disconnectListener);
+        }
+
+        if (player.isOnline()) {
+            player.stopSpectating();
+            player.setGameMode(originalGameMode);
+        }
 
         if (cameraEntity != null) {
             cameraEntity.remove();
@@ -88,11 +100,6 @@ public class Cursor {
         if (dotEntity != null) {
             dotEntity.remove();
             dotEntity = null;
-        }
-
-        if (playerNode != null) {
-            Main.node.removeChild(playerNode);
-            playerNode = null;
         }
 
         active = false;

@@ -20,10 +20,8 @@ public class cursor extends Command implements ZeroCommand {
     public cursor() {
         super("cursor");
         setUsage("/cursor <on|off>");
-
         ArgumentEnum<@NotNull CursorAction> action = ArgumentType.Enum("action", CursorAction.class)
                 .setFormat(ArgumentEnum.Format.LOWER_CASED);
-
         addPlayerSyntax((player, context) -> {
             switch (context.get(action)) {
                 case ON -> {

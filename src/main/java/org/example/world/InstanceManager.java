@@ -4,61 +4,86 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.trait.InstanceEvent;
+import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.WorldBorder;
 import net.minestom.server.instance.anvil.AnvilLoader;
 import org.example.Main;
 import org.example.extras.AutoRegister;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class InstanceManager {
 
-    private static final Map<Integer, InstanceContainer> instances = new HashMap<>();
-    private static final Map<Integer, EventNode<InstanceEvent>> instanceNodes = new HashMap<>();
+    private static final Map<Worlds, InstanceContainer> instances = new HashMap<>();
+    private static final Map<Worlds, EventNode<InstanceEvent>> instanceNodes = new HashMap<>();
 
     public static void setupInstances(String[] args) {
         var instanceManager = MinecraftServer.getInstanceManager();
-        int count = 2;
 
-        if (args != null && args.length > 0) {
-            try {
-                count = Math.max(1, Integer.parseInt(args[0]));
-            } catch (NumberFormatException ignored) {}
-        }
+        for (Worlds element : Worlds.values()) {
+            InstanceContainer instance = instanceManager.createInstanceContainer();
+            instance.setChunkLoader(new AnvilLoader("worlds/world_" + element));
+            instances.put(element, instance);
 
-        for (int i = 1; i <= count; i++) {
-            InstanceContainer inst = instanceManager.createInstanceContainer();
-            inst.setChunkLoader(new AnvilLoader("worlds/world_" + i));
-            instances.put(i, inst);
+            //GenWorld.init(instance);
+            instance.setTime(0);
+            instance.setWorldBorder(WorldBorder.DEFAULT_BORDER.withDiameter(128));
 
-            GenWorld.init(inst);
-            inst.setTime(0);
-            inst.setWorldBorder(WorldBorder.DEFAULT_BORDER.withDiameter(128));
-            final InstanceContainer finalInst = inst;
+            // Создаём node с фильтром именно для этого инстанса
             EventNode<InstanceEvent> instanceNode = EventNode.type(
-                    "instance-node-" + i,
+                    "instance-node-" + element.name(),
                     EventFilter.INSTANCE,
-                    (event, targetInstance) -> targetInstance.equals(finalInst)
+                    (event, targetInstance) -> targetInstance.equals(instance)  // можно использовать instance напрямую
             );
 
-            instanceNodes.put(i, instanceNode);
+            instanceNodes.put(element, instanceNode);
             Main.node.addChild(instanceNode);
-            AutoRegister.registerInstanceEvents(instanceNode, inst, "org.example.events.handlers");
-            System.out.println("Инстанс " + i + " инициализирован");
+
+            AutoRegister.registerInstanceEvents(instanceNode, instance, "org.example.events.handlers");
+
+            System.out.println("Инстанс " + element + " инициализирован");
         }
+
+
+
+
+
+
     }
 
-    public static InstanceContainer getInstanceById(int id) {
+    public static InstanceContainer getInstanceById(Worlds id) {
         return instances.get(id);
     }
 
-    public static EventNode<InstanceEvent> getNodeByInstanceId(int id) {
+    public static EventNode<InstanceEvent> getNodeByInstanceId(Worlds id) {
         return instanceNodes.get(id);
     }
 
-    public static Map<Integer, InstanceContainer> getInstances() {
-        return instances;
+    public static InstanceContainer getInstanceById(String idStr) {
+        return instances.entrySet().stream()
+                .filter(e -> e.getKey().name().equalsIgnoreCase(idStr))
+                .map(Map.Entry::getValue)
+                .findFirst()
+                .orElse(null);
+    }
+    public static String getIdByInstance(Instance instance) {
+        return instances.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(instance))
+                .map(entry -> entry.getKey().name())
+                .findFirst()
+                .orElse("unknown"); // Возвращаем "unknown", если инстанс не найден в базе
+    }
+    public static Map<Worlds, InstanceContainer> getInstances() {
+        return instances;                    // возвращаем как есть
+    }
+
+    // Или если хочешь Map<String, ...> для команд:
+    public static Map<String, InstanceContainer> getInstancesAsStringKey() {
+        Map<String, InstanceContainer> map = new HashMap<>();
+        instances.forEach((world, inst) -> map.put(world.name(), inst)); // или world.toString()
+        return map;
     }
 }

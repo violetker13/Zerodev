@@ -64,7 +64,8 @@ public class Main {
         InstanceManager.setupInstances(args);
 
         // Регистрация
-        AutoRegister.registerEvents(node, InstanceManager.getInstanceById(1), "org.example.events.global");
+        AutoRegister.registerEvents(node, InstanceManager.getInstanceById("auth"), "org.example.events.global");
+
         AutoRegister.registerCommands("org.example.comands");
 
         server.start("0.0.0.0", 20000);

@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -11,19 +12,33 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
 public class Utils {
     private static final Random RANDOM = new Random();
 
-    public static <T> T RandomElementSet(Set<T> set) {
-        if (set == null || set.isEmpty()) return null;
-        return set.stream()
-                .skip(RANDOM.nextInt(set.size()))
-                .findFirst()
-                .orElse(null);
-    }
+    private static int last = -1;
+    private static final Set<String> Citates = Set.of(
+            "&7 - Я это не трогал... оно само сломалось",
+            "&7 - Работает? Не трогай. Серьёзно, просто не трогай",
+            "&7 - Я потом разберусь — классическая ложь самому себе",
+            "&7 - Если не понимаешь код — значит писал его ты вчера",
+            "&7 - Всё работало до того, как я решил улучшить",
+            "&7 - Быстро фиксится только то, что не сломано",
+            "&7 - Почему работает — никто не знает, но лучше не трогать",
+            "&7 - Я просто поменял одну строчку…",
+            "&7 - Этот баг жил тут дольше, чем я в этом проекте",
+            "&7 - Документация устарела в момент создания",
+            "&7 - Я думал это будет просто",
+            "&7 - Логов нет, значит проблема не существует (нет)",
+            "&7 - Сначала работает, потом начинает мстить",
+            "&7 - Почему оно сломалось именно сейчас?",
+            "&7 - Это не костыль, это временное архитектурное решение",
+            "&7 - Я это фиксить не буду, оно как-то само держится"
+    );
 
     public static String uploadPack(Path packFile) throws Exception {
         final String OWNER = "violetker13";
@@ -165,5 +180,31 @@ public class Utils {
         return result;
     }
 
+    public static <T> T getRandomSetElement(Set<T> set) {
+        List<T> list = new ArrayList<>(set);
+        return list.get(RANDOM.nextInt(list.size()));
+    }
+
+    public static String fetchCitate(){
+        return getRandomSetElement(Citates);
+    }
+
+    public static byte[] getIcon() {
+        int next;
+
+        do {
+            next = RANDOM.nextInt(16);
+        } while (next == last);
+
+        last = next;
+
+        String path = "/home/mihail/IdeaProjects/minestome/icons/sprite_" + next + ".png";
+
+        try {
+            return Files.readAllBytes(Path.of(path));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

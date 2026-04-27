@@ -16,7 +16,7 @@ import org.example.api.zero_command.ZeroCommand;
 public class WandCommand extends Command implements ZeroCommand {
     public WandCommand() {
         super("/wand");
-        setUsage("//wand");
+        setUsage("/wand");
 
         addPlayerSyntax((player, context) -> {
             player.getInventory().addItemStack(ItemStack.builder(Material.WOODEN_AXE)
