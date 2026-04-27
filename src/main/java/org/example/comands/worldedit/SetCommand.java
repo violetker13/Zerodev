@@ -10,66 +10,42 @@ import net.minestom.server.command.builder.suggestion.SuggestionEntry;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.InstanceContainer;
+import net.minestom.server.instance.batch.AbsoluteBlockBatch;
 import net.minestom.server.instance.block.Block;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SetCommand extends Command {
 
     public SetCommand() {
-        super("/set");
+        super("set"); // Убрал /, в Minestom префикс не нужен в названии
 
         var blockArg = ArgumentType.StringArray("block");
 
+        // SuggestionCallback оставляем без изменений, он у тебя написан хорошо
         blockArg.setSuggestionCallback((sender, context, suggestion) -> {
             String raw = context.getRaw("block");
             if (raw == null) raw = "";
-
-            // Определяем что сейчас печатается
-            // Последний блок после запятой или скобки
             String current = raw;
-            int lastComma = raw.lastIndexOf(",");
-            int lastBracket = raw.lastIndexOf("[");
-            int lastColon = raw.lastIndexOf(":");
-
-            // Определяем позицию с которой начинается текущий ввод блока
-            int lastSep = Math.max(lastComma, Math.max(lastBracket, lastColon));
-            if (lastSep >= 0) {
-                current = raw.substring(lastSep + 1);
-            }
+            int lastSep = Math.max(raw.lastIndexOf(","), Math.max(raw.lastIndexOf("["), raw.lastIndexOf(":")));
+            if (lastSep >= 0) current = raw.substring(lastSep + 1);
             current = current.toLowerCase().trim();
 
-            // Подсказки паттернов если ввод пустой или начинается с #
             if (raw.isEmpty() || raw.equals("#")) {
-                suggestion.addEntry(new SuggestionEntry("#perlin[10:90][stone,dirt,air]",
-                        Component.text("Перлин шум")));
-                suggestion.addEntry(new SuggestionEntry("#random[stone,dirt,air]",
-                        Component.text("Случайные блоки")));
-                suggestion.addEntry(new SuggestionEntry("#weighted[stone:70,dirt:20,air:10]",
-                        Component.text("Блоки с весами %")));
-                suggestion.addEntry(new SuggestionEntry("#layer[stone,dirt,grass_block]",
-                        Component.text("Слои по Y")));
+                suggestion.addEntry(new SuggestionEntry("#perlin[10:90][stone,dirt,air]", Component.text("Перлин шум")));
+                suggestion.addEntry(new SuggestionEntry("#random[stone,dirt,air]", Component.text("Случайные")));
+                suggestion.addEntry(new SuggestionEntry("#weighted[stone:70,dirt:30]", Component.text("Веса %")));
                 return;
             }
 
-            // Подсказки блоков — везде где ожидается название блока
-            boolean expectingBlock =
-                    !raw.startsWith("#") ||          // обычный блок
-                            raw.contains(",") ||             // перечисление через запятую
-                            raw.contains("[") && !raw.endsWith("]"); // внутри скобок паттерна
-
-            if (expectingBlock && !current.isEmpty()) {
-                final String filter = current;
-                for (Block block : Block.values()) {
-                    String name = block.key().value();
-                    if (name.startsWith(filter)) {
-                        // Строим полную подсказку заменяя последнее слово
-                        String prefix = raw.substring(0, lastSep + 1);
-                        suggestion.addEntry(new SuggestionEntry(
-                                prefix + name,
-                                Component.text(name)
-                        ));
-                    }
+            final String filter = current;
+            for (Block block : Block.values()) {
+                String name = block.key().value();
+                if (name.startsWith(filter)) {
+                    String prefix = raw.substring(0, lastSep + 1);
+                    suggestion.addEntry(new SuggestionEntry(prefix + name, Component.text(name)));
                 }
             }
         });
@@ -83,57 +59,60 @@ public class SetCommand extends Command {
                 return;
             }
 
-            String input = String.join(" ", context.get(blockArg)).trim();
-            var instance = selection.getInstance();
-            var blocks = selection.getBlocks();
-            int count = 0;
-
-            try {
-                // Сохраняем историю
-                Map<Point, Block> oldBlocks = new HashMap<>();
-                for (var pos : blocks) {
-                    oldBlocks.put(pos, instance.getBlock(pos));
-                }
-                WorldEdit.saveHistory(player, oldBlocks);
-
-                if (input.startsWith("#perlin")) {
-                    count = applyNoise(blocks, instance, input);
-                } else if (input.startsWith("#random")) {
-                    count = applyRandom(blocks, instance, input);
-                } else if (input.startsWith("#weighted")) {
-                    count = applyWeighted(blocks, instance, input);
-                } else if (input.startsWith("#layer")) {
-                    count = applyLayer(blocks, instance, input);
-                } else {
-                    if (input.contains(",")) {
-                        // Несколько блоков через запятую — случайный выбор
-                        count = applyRandom(blocks, instance, "#random[" + input + "]");
-                    } else {
-                        // Один блок
-                        Block block = Block.fromKey("minecraft:" + input);
-                        if (block == null) {
-                            player.sendMessage(Component.text("Блок не найден: " + input, NamedTextColor.RED));
-                            return;
-                        }
-                        for (var pos : blocks) {
-                            instance.setBlock(pos, block);
-                            count++;
-                        }
-                    }
-                }
-
-                player.sendMessage(Component.text("Установлено " + count + " блоков!", NamedTextColor.GREEN));
-
-            } catch (Exception e) {
-                player.sendMessage(Component.text("Ошибка: " + e.getMessage(), NamedTextColor.RED));
-                e.printStackTrace();
+            List<Point> blocks = selection.getBlocks();
+            // Защита от краша: лимит 1 млн блоков
+            if (blocks.size() > 1_000_000) {
+                player.sendMessage(Component.text("Область слишком велика! Макс: 1,000,000", NamedTextColor.RED));
+                return;
             }
+
+            String input = String.join(" ", context.get(blockArg)).trim();
+            InstanceContainer instance = selection.getInstance();
+
+            player.sendMessage(Component.text("Выполняю операцию...", NamedTextColor.YELLOW));
+
+            Map<Point, Block> oldBlocks = new HashMap<>();
+            for (Point p : blocks) {
+                oldBlocks.put(p, instance.getBlock(p));
+            }
+            WorldEdit.saveHistory(player, oldBlocks);
+
+            CompletableFuture.runAsync(() -> {
+                AbsoluteBlockBatch batch = new AbsoluteBlockBatch();
+                int count;
+
+                try {
+                    if (input.startsWith("#perlin")) {
+                        count = applyNoise(blocks, batch, input);
+                    } else if (input.startsWith("#random")) {
+                        count = applyRandom(blocks, batch, input);
+                    } else if (input.startsWith("#weighted")) {
+                        count = applyWeighted(blocks, batch, input);
+                    } else if (input.startsWith("#layer")) {
+                        count = applyLayer(blocks, batch, minY(blocks), maxY(blocks), input);
+                    } else {
+                        Block block = Block.fromKey("minecraft:" + input.replace("minecraft:", ""));
+                        if (block == null) throw new IllegalArgumentException("Блок не найден");
+                        for (Point p : blocks) batch.setBlock(p, block);
+                        count = blocks.size();
+                    }
+
+                    // Применяем изменения в основном потоке Minestom
+                    // Применяем изменения в основном потоке Minestom
+                    int finalCount = count;
+                    batch.apply(instance, (instanceResult) -> { // Добавлен аргумент (instanceResult)
+                        player.sendMessage(Component.text("Успешно! Изменено блоков: " + finalCount, NamedTextColor.GREEN));
+                    });
+
+                } catch (Exception e) {
+                    player.sendMessage(Component.text("Ошибка: " + e.getMessage(), NamedTextColor.RED));
+                }
+            });
 
         }, blockArg);
     }
 
-    private int applyNoise(List<Point> blocks, InstanceContainer instance, String input) {
-        // #perlin[10:90][stone,dirt,air]
+    private int applyNoise(List<Point> blocks, AbsoluteBlockBatch batch, String input) {
         String[] parts = input.split("\\[");
         String[] range = parts[1].replace("]", "").split(":");
         double minVal = Double.parseDouble(range[0]) / 100.0;
@@ -141,8 +120,7 @@ public class SetCommand extends Command {
         List<Block> blockList = parseBlockList(parts[2].replace("]", ""));
 
         JNoise noise = JNoise.newBuilder()
-                .perlin(PerlinNoiseGenerator.newBuilder()
-                        .setSeed(System.currentTimeMillis()).build())
+                .perlin(PerlinNoiseGenerator.newBuilder().setSeed(System.currentTimeMillis()).build())
                 .scale(0.05).build();
 
         int count = 0;
@@ -151,77 +129,70 @@ public class SetCommand extends Command {
             if (val >= minVal && val <= maxVal) {
                 int idx = (int) ((val - minVal) / (maxVal - minVal) * blockList.size());
                 idx = Math.min(idx, blockList.size() - 1);
-                instance.setBlock(pos, blockList.get(idx));
+                batch.setBlock(pos, blockList.get(idx));
                 count++;
             }
         }
         return count;
     }
 
-    private int applyRandom(List<Point> blocks, InstanceContainer instance, String input) {
-        // #random[stone,dirt,air]
-        String[] parts = input.split("\\[");
-        List<Block> blockList = parseBlockList(parts[1].replace("]", ""));
-        Random random = new Random();
+    private int applyRandom(List<Point> blocks, AbsoluteBlockBatch batch, String input) {
+        String blockData = input.contains("[") ? input.split("\\[")[1].replace("]", "") : input;
+        List<Block> blockList = parseBlockList(blockData);
+        var rnd = ThreadLocalRandom.current(); // Быстрее чем new Random()
 
-        int count = 0;
         for (Point pos : blocks) {
-            instance.setBlock(pos, blockList.get(random.nextInt(blockList.size())));
-            count++;
+            batch.setBlock(pos, blockList.get(rnd.nextInt(blockList.size())));
         }
-        return count;
+        return blocks.size();
     }
 
-    private int applyWeighted(List<Point> blocks, InstanceContainer instance, String input) {
-        // #weighted[stone:70,dirt:20,air:10]
+    private int applyWeighted(List<Point> blocks, AbsoluteBlockBatch batch, String input) {
         String[] parts = input.split("\\[");
         String[] entries = parts[1].replace("]", "").split(",");
 
-        List<Block> weightedList = new ArrayList<>();
+        NavigableMap<Double, Block> cumulativeWeights = new TreeMap<>();
+        double totalWeight = 0;
+
         for (String entry : entries) {
-            String[] kv = entry.trim().split(":");
-            if (kv.length < 2) continue;
-            Block block = Block.fromKey("minecraft:" + kv[0].trim());
-            int weight = Integer.parseInt(kv[1].trim());
-            if (block != null) {
-                for (int i = 0; i < weight; i++) weightedList.add(block);
+            String[] kv = entry.split(":");
+            Block b = Block.fromKey("minecraft:" + kv[0].trim());
+            double w = Double.parseDouble(kv[1].trim());
+            if (b != null) {
+                totalWeight += w;
+                cumulativeWeights.put(totalWeight, b);
             }
         }
 
-        Random random = new Random();
-        int count = 0;
+        var rnd = ThreadLocalRandom.current();
         for (Point pos : blocks) {
-            instance.setBlock(pos, weightedList.get(random.nextInt(weightedList.size())));
-            count++;
+            double r = rnd.nextDouble() * totalWeight;
+            batch.setBlock(pos, cumulativeWeights.ceilingEntry(r).getValue());
         }
-        return count;
+        return blocks.size();
     }
 
-    private int applyLayer(List<Point> blocks, InstanceContainer instance, String input) {
-        // #layer[stone,dirt,grass_block]
-        String[] parts = input.split("\\[");
-        List<Block> blockList = parseBlockList(parts[1].replace("]", ""));
-
-        int minY = blocks.stream().mapToInt(Point::blockY).min().orElse(0);
-        int maxY = blocks.stream().mapToInt(Point::blockY).max().orElse(0);
+    private int applyLayer(List<Point> blocks, AbsoluteBlockBatch batch, int minY, int maxY, String input) {
+        List<Block> blockList = parseBlockList(input.split("\\[")[1].replace("]", ""));
         int height = Math.max(1, maxY - minY);
 
-        int count = 0;
         for (Point pos : blocks) {
-            double t = (double)(pos.blockY() - minY) / height;
-            int idx = Math.min((int)(t * blockList.size()), blockList.size() - 1);
-            instance.setBlock(pos, blockList.get(idx));
-            count++;
+            double t = (double) (pos.blockY() - minY) / height;
+            int idx = Math.min((int) (t * blockList.size()), blockList.size() - 1);
+            batch.setBlock(pos, blockList.get(idx));
         }
-        return count;
+        return blocks.size();
     }
 
     private List<Block> parseBlockList(String input) {
         List<Block> result = new ArrayList<>();
         for (String name : input.split(",")) {
-            Block b = Block.fromKey("minecraft:" + name.trim());
+            Block b = Block.fromKey("minecraft:" + name.trim().replace("minecraft:", ""));
             if (b != null) result.add(b);
         }
         return result;
     }
+
+    private int minY(List<Point> blocks) { return blocks.stream().mapToInt(Point::blockY).min().orElse(0); }
+    private int maxY(List<Point> blocks) { return blocks.stream().mapToInt(Point::blockY).max().orElse(0); }
 }

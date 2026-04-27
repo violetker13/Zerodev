@@ -5,72 +5,54 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.command.builder.suggestion.SuggestionEntry;
-import net.minestom.server.entity.Player;
 import net.minestom.server.instance.InstanceContainer;
-import org.example.Main;
+import org.example.api.zero_command.ZeroCommand;
 
 import static org.example.world.InstanceManager.getInstanceById;
 import static org.example.world.InstanceManager.getInstances;
 
-public class server extends Command {
+public class server extends Command implements ZeroCommand {
     public server() {
         super("server");
+        setUsage("/server <id>");
 
-        setDefaultExecutor((sender, context) -> {
+        getCommand().setDefaultExecutor((sender, context) -> {
             sender.sendMessage(Component.text("Доступные серверы:", NamedTextColor.GOLD));
-            getInstances().forEach((id, inst) -> {
-                int players = inst.getPlayers().size();
-                sender.sendMessage(Component.text(
-                        "  #" + id + " — " + players + " игроков",
-                        NamedTextColor.YELLOW
-                ));
-            });
-            sender.sendMessage(Component.text("Использование: /server <id>", NamedTextColor.GRAY));
+            getInstances().forEach((id, inst) -> sender.sendMessage(Component.text(
+                    "  #" + id + " — " + inst.getPlayers().size() + " игроков",
+                    NamedTextColor.YELLOW
+            )));
         });
 
         var arg = ArgumentType.Integer("id");
-
-        arg.setSuggestionCallback((sender, context, suggestion) -> {
-            getInstances().forEach((id, inst) -> {
-                int players = inst.getPlayers().size();
-                suggestion.addEntry(new SuggestionEntry(
+        arg.setSuggestionCallback((sender, context, suggestion) ->
+                getInstances().forEach((id, inst) -> suggestion.addEntry(new SuggestionEntry(
                         String.valueOf(id),
-                        Component.text("Инстанс #" + id + " (" + players + " игроков)")
-                ));
-            });
-        });
+                        Component.text("Инстанс #" + id + " (" + inst.getPlayers().size() + " игроков)")
+                )))
+        );
 
-        addSyntax((sender, context) -> {
-            if (!(sender instanceof Player player)) {
-                return;
-            }
-
+        addPlayerSyntax((player, context) -> {
             int id = context.get(arg);
             InstanceContainer target = getInstanceById(id);
 
             if (target == null) {
-                player.sendMessage(Component.text(
-                        "Инстанс #" + id + " не найден!", NamedTextColor.RED
-                ));
+                sendError(player, "Инстанс #" + id + " не найден!");
                 return;
             }
-
             if (player.getInstance() != null && player.getInstance().equals(target)) {
-                player.sendMessage(Component.text(
-                        "Вы уже на сервере #" + id + "!", NamedTextColor.YELLOW
-                ));
+                sendError(player, "Вы уже на сервере #" + id + "!");
                 return;
             }
 
-            player.sendMessage(Component.text(
-                    "Перемещение на сервер #" + id + "...", NamedTextColor.GREEN
-            ));
+            player.sendMessage("Перемещение на сервер #" + id + "...");
             player.setInstance(target, target.getPlayers().isEmpty()
                     ? player.getRespawnPoint()
                     : player.getPosition()
             );
-
-
         }, arg);
     }
+
+    @Override
+    public Command getCommand() { return this; }
 }

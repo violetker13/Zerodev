@@ -3,17 +3,17 @@ package org.example.comands.worldedit;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.command.builder.Command;
-import net.minestom.server.coordinate.Point;
 import net.minestom.server.entity.Player;
-import net.minestom.server.instance.block.Block;
+import net.minestom.server.instance.InstanceContainer;
+import net.minestom.server.instance.batch.AbsoluteBlockBatch;
 
-import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class UndoCommand extends Command {
     public UndoCommand() {
-        super("/undo");
+        super("undo");
 
-        addSyntax((sender, context) -> {
+        setDefaultExecutor((sender, context) -> {
             if (!(sender instanceof Player player)) return;
 
             var history = WorldEdit.getHistory(player);
@@ -22,19 +22,22 @@ public class UndoCommand extends Command {
                 return;
             }
 
-            // Берём последнее действие
-            Map<Point, Block> last = history.pop();
-            var instance = (net.minestom.server.instance.InstanceContainer) player.getInstance();
+            // Достаем последние сохраненные блоки
+            var lastChange = history.pop();
+            var instance = (InstanceContainer) player.getInstance();
+            if (instance == null) return;
 
-            // Восстанавливаем блоки
-            for (Map.Entry<Point, Block> entry : last.entrySet()) {
-                instance.setBlock(entry.getKey(), entry.getValue());
-            }
+            player.sendMessage(Component.text("Отмена... (" + lastChange.size() + " блоков)", NamedTextColor.YELLOW));
 
-            player.sendMessage(Component.text(
-                    "Отменено " + last.size() + " блоков!",
-                    NamedTextColor.GREEN
-            ));
+            // Асинхронно применяем отмену через батч
+            CompletableFuture.runAsync(() -> {
+                AbsoluteBlockBatch batch = new AbsoluteBlockBatch();
+                lastChange.forEach(batch::setBlock);
+
+                batch.apply(instance, (inst) -> {
+                    player.sendMessage(Component.text("Успешно отменено!", NamedTextColor.GREEN));
+                });
+            });
         });
     }
 }
