@@ -20,7 +20,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class SetCommand extends Command {
 
     public SetCommand() {
-        super("set"); // Убрал /, в Minestom префикс не нужен в названии
+        super("/set"); // Убрал /, в Minestom префикс не нужен в названии
 
         var blockArg = ArgumentType.StringArray("block");
 

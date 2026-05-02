@@ -12,6 +12,9 @@ import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.trait.PlayerEvent;
+import net.minestom.server.network.packet.server.play.CameraPacket;
+import net.minestom.server.potion.Potion;
+import net.minestom.server.potion.PotionEffect;
 import org.example.Main;
 
 public class Cursor {
@@ -34,28 +37,23 @@ public class Cursor {
 
     public Cursor summon() {
         if (active) return this;
-
         player.setGameMode(GameMode.SPECTATOR);
-
-        // Запоминаем центр
+        player.addEffect(new Potion(PotionEffect.INVISIBILITY,2,-1));
         centerYaw = player.getPosition().yaw();
         centerPitch = player.getPosition().pitch();
 
         Pos spawnPos = player.getPosition().add(0, 1.6, 0);
-
-        // 1. Заморозка камеры
-        cameraEntity = new Entity(EntityType.ITEM_DISPLAY);
+        cameraEntity = new Entity(EntityType.TEXT_DISPLAY);
         cameraEntity.setNoGravity(true);
         cameraEntity.setInstance(player.getInstance(), spawnPos);
         cameraEntity.addPassenger(player);
         player.spectate(cameraEntity);
-
-        // 2. Точка курсора
         dotEntity = new Entity(EntityType.TEXT_DISPLAY);
         dotEntity.setNoGravity(true);
         TextDisplayMeta meta = (TextDisplayMeta) dotEntity.getEntityMeta();
         meta.setText(Component.text("•"));
         meta.setBillboardRenderConstraints(TextDisplayMeta.BillboardConstraints.CENTER);
+        meta.setPosRotInterpolationDuration(1);
         meta.setSeeThrough(true);
         meta.setBackgroundColor(0);
         dotEntity.setInstance(player.getInstance(), calcDotPos(centerYaw, centerPitch));
@@ -74,12 +72,6 @@ public class Cursor {
 
     public void remove() {
         if (!active) return;
-
-        // Очищаем слушатели с игрока, чтобы они не копились, если он включит курсор снова
-        // Но так как Minestom не дает легко удалить конкретный листенер без Handle,
-        // проще всего привязать жизненный цикл курсора к сущностям.
-
-        // Удаляем конкретные слушатели, чтобы они не дублировались при следующем включении
         if (moveListener != null) {
             player.eventNode().removeListener(moveListener);
         }
@@ -108,10 +100,9 @@ public class Cursor {
     private void onMove(PlayerMoveEvent event) {
         if (dotEntity == null) return;
 
-        // Получаем отклонение от центра
         float yaw = event.getNewPosition().yaw();
         float pitch = event.getNewPosition().pitch();
-
+        cameraEntity.teleport(event.getNewPosition());
         dotEntity.teleport(calcDotPos(yaw, pitch));
     }
 

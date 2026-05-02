@@ -25,37 +25,12 @@ public class WandCommand extends Command implements ZeroCommand {
             player.sendMessage("Топорик выдан! ЛКМ = pos1, ПКМ = pos2");
         });
 
-        registerListeners();
+
     }
 
-    private void registerListeners() {
-        Main.node.addListener(PlayerBlockBreakEvent.class, event -> {
-            Player player = event.getPlayer();
-            if (!isHoldingWand(player)) return;
-            event.setCancelled(true);
-            var pos = event.getBlockPosition();
-            WorldEdit.getSelection(player).setPos1(pos, (InstanceContainer) player.getInstance());
-            player.sendMessage(Component.text(
-                    "Pos1: " + pos.blockX() + " " + pos.blockY() + " " + pos.blockZ(),
-                    NamedTextColor.GREEN
-            ));
-        });
 
-        Main.node.addListener(PlayerBlockInteractEvent.class, event -> {
-            if (!event.getHand().equals(PlayerHand.MAIN)) return;
-            Player player = event.getPlayer();
-            if (!isHoldingWand(player)) return;
-            event.setCancelled(true);
-            var pos = event.getBlockPosition();
-            WorldEdit.getSelection(player).setPos2(pos, (InstanceContainer) player.getInstance());
-            player.sendMessage(Component.text(
-                    "Pos2: " + pos.blockX() + " " + pos.blockY() + " " + pos.blockZ(),
-                    NamedTextColor.RED
-            ));
-        });
-    }
 
-    private boolean isHoldingWand(Player player) {
+    public static boolean isHoldingWand(Player player) {
         return player.getItemInMainHand().material() == Material.WOODEN_AXE;
     }
 

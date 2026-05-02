@@ -10,6 +10,7 @@ import net.minestom.server.instance.InstanceContainer;
 import org.example.events.EventHandler;
 import org.reflections.Reflections;
 
+import java.lang.reflect.Field;
 import java.util.Set;
 
 public class AutoRegister {

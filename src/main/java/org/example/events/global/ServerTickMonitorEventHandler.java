@@ -1,6 +1,7 @@
 package org.example.events.global;
 
 import com.sun.management.OperatingSystemMXBean;
+import com.sun.net.httpserver.Request;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
@@ -11,17 +12,21 @@ import org.example.extras.PlayerUtils;
 import org.example.extras.Utils;
 
 import java.awt.*;
+import java.io.IOException;
+import java.net.Socket;
 
 import static org.example.world.InstanceManager.getIdByInstance;
-
 public class ServerTickMonitorEventHandler extends EventHandler {
-    private  int tickCount = 0;
+    private int tickCount = 0;
+
     @Override
     public void register(EventNode<Event> node, InstanceContainer instance) {
+        // Запускаем проверку каждые 10 секунд в отдельном потоке
+
+
         node.addListener(ServerTickMonitorEvent.class, event -> {
-            if (tickCount++ % 20 != 0) {
-                return;
-            }
+            if (tickCount++ % 20 != 0) return;
+
             var monitor = event.getTickMonitor();
             long usedMemory = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024 / 1024;
             long maxMemory = Runtime.getRuntime().maxMemory() / 1024 / 1024;
@@ -30,13 +35,16 @@ public class ServerTickMonitorEventHandler extends EventHandler {
             String footerTemplate = "&6Твой пинг: &f%dms\n\n" +
                     "&2TPS: &a%.2f &8| &2MSPT: &d%.2fms\n" +
                     "&2RAM: &e%dMB &7/ &e%dMB";
-            var headerBase = Utils.ColorizeText("&6Тестирование\n\n&8ZeroDev");
+            var headerBase = Utils.ColorizeText(
+                    "&6Тестирование\n\n&8ZeroDev"
+            );
             PlayerUtils.getAllPlayers().forEach(player -> {
                 player.sendPlayerListHeaderAndFooter(
-                        headerBase.append(Utils.ColorizeText("\n&7Сервер: &f" + (getIdByInstance(player.getInstance())))),
+                        headerBase.append(Utils.ColorizeText("\n&7Сервер: &f" + getIdByInstance(player.getInstance()))),
                         Utils.ColorizeText(String.format(footerTemplate, player.getLatency(), tps, mspt, usedMemory, maxMemory))
                 );
             });
         });
     }
+
 }

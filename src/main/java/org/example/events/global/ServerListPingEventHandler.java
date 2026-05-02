@@ -12,9 +12,6 @@ import org.example.extras.Utils;
 
 import static java.lang.Math.clamp;
 public class ServerListPingEventHandler extends EventHandler {
-
-
-
     @Override
     public void register(EventNode<Event> node, InstanceContainer instance) {
         node.addListener(ServerListPingEvent.class, event -> {

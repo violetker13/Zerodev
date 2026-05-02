@@ -29,6 +29,7 @@ public class cursor extends Command implements ZeroCommand {
                         sendError(player, "Курсор уже активен!");
                         return;
                     }
+
                     cursors.put(player.getUuid(), Cursor.of(player));
                     player.sendMessage("Курсор включён!");
                 }

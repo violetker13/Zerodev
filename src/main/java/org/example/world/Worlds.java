@@ -2,5 +2,6 @@ package org.example.world;
 
 public enum Worlds {
     auth,
-    spawn
+    spawn,
+    limbo
 }

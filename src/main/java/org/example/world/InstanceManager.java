@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.example.world.GenWorld.light;
+
 public class InstanceManager {
 
     private static final Map<Worlds, InstanceContainer> instances = new HashMap<>();
@@ -28,15 +30,14 @@ public class InstanceManager {
             instance.setChunkLoader(new AnvilLoader("worlds/world_" + element));
             instances.put(element, instance);
 
-            //GenWorld.init(instance);
+            GenWorld.light(instance);
             instance.setTime(0);
             instance.setWorldBorder(WorldBorder.DEFAULT_BORDER.withDiameter(128));
 
-            // Создаём node с фильтром именно для этого инстанса
             EventNode<InstanceEvent> instanceNode = EventNode.type(
                     "instance-node-" + element.name(),
                     EventFilter.INSTANCE,
-                    (event, targetInstance) -> targetInstance.equals(instance)  // можно использовать instance напрямую
+                    (event, targetInstance) -> targetInstance.equals(instance)
             );
 
             instanceNodes.put(element, instanceNode);

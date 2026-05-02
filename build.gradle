@@ -8,15 +8,17 @@ group = 'org.example'
 version = '1.0-SNAPSHOT'
 
 repositories {
+    maven { url 'https://repo.hypera.dev/snapshots/' }
+    maven { url 'https://repo.lucko.me/' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     mavenCentral()
-
 }
-
 application {
     mainClass = 'org.example.Main'
 }
 dependencies {
     implementation('net.minestom:minestom:2026.04.13-1.21.11')
+    implementation("dev.lu15:spark-minestom:1.10-SNAPSHOT")
 
     implementation 'de.articdive:jnoise-pipeline:4.0.0'
     implementation 'org.reflections:reflections:0.10.2'

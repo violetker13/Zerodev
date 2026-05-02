@@ -30,11 +30,7 @@ public class PlayerUtils {
 
     }
 
-    //загрузчик рп resourcepack/pack.zip, который должен быть в папке рядом с jar файлом, при загрузке игрока на сервер
-    public static void LoadResourcePack(Player player) {
-        if (Main.packUrl != null) {player.sendResourcePacks(ResourcePackRequest.resourcePackRequest().packs(ResourcePackInfo.resourcePackInfo().id(UUID.fromString("550e8400-e29b-41d4-a716-446655440000")).uri(URI.create(Main.packUrl)).hash(Main.packHash).build()).required(false).build());
-        }
-    }
+
 
 
 
