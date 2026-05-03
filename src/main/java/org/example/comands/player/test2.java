@@ -14,6 +14,7 @@ import org.example.api.blockbench.ObjLoader;
 import org.example.api.blockbench.VertexBuffer;
 import org.example.api.blockbench.player.HeadPartModel;
 import org.example.api.blockbench.player.Part;
+import org.example.api.blockbench.player.PlayerBodyAttachment;
 import org.example.api.blockbench.player.PlayerBodyModel;
 import org.example.api.zero_command.ZeroCommand;
 
@@ -31,7 +32,7 @@ public class test2 extends Command implements ZeroCommand {
         setUsage("/test2 <msg>");
 
         addPlayerSyntax(((player, context) -> {
-
+                player.getEntityMeta().setInvisible(true);
                 onChat(player);
                 player.sendMessage(Component.text("Создано " + spawnedEntities.size() + " вершин"));
 
@@ -58,10 +59,7 @@ public class test2 extends Command implements ZeroCommand {
             PlayerBodyModel body = new PlayerBodyModel();
             body.spawn(instance, origin);
             activeBodies.put(uuid, body);
-
-            player.sendMessage("§aТело Нотча заспавнено!");
-
-
+            PlayerBodyAttachment.attach(player, body);
     }
     @Override
     public Command getCommand() {

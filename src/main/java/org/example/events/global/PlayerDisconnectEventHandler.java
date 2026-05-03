@@ -6,6 +6,7 @@ import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.instance.InstanceContainer;
+import org.example.api.blockbench.player.PlayerBodyAttachment;
 import org.example.events.EventHandler;
 
 import java.awt.*;
@@ -19,7 +20,7 @@ public class PlayerDisconnectEventHandler extends EventHandler {
             // Получаем имя игрока заранее
             String username = event.getPlayer().getUsername();
 
-            // Формируем сообщение
+            PlayerBodyAttachment.detach(event.getPlayer());
             var message = Component.text(username + " отключился от сервера.")
                     .color(NamedTextColor.BLUE);
             getAllPlayers().forEach(plr -> plr.sendMessage(message));
