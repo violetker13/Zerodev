@@ -1,0 +1,35 @@
+{
+  "name": "walk",
+  "length": 0.8,
+  "loop": true,
+  "bones": {
+    "left_leg": {
+      "keyframes": [
+        { "time": 0.0, "rx":  35, "ry": 0, "rz": 0 },
+        { "time": 0.4, "rx": -35, "ry": 0, "rz": 0 },
+        { "time": 0.8, "rx":  35, "ry": 0, "rz": 0 }
+      ]
+    },
+    "right_leg": {
+      "keyframes": [
+        { "time": 0.0, "rx": -35, "ry": 0, "rz": 0 },
+        { "time": 0.4, "rx":  35, "ry": 0, "rz": 0 },
+        { "time": 0.8, "rx": -35, "ry": 0, "rz": 0 }
+      ]
+    },
+    "left_arm": {
+      "keyframes": [
+        { "time": 0.0, "rx": -25, "ry": 0, "rz": 0 },
+        { "time": 0.4, "rx":  25, "ry": 0, "rz": 0 },
+        { "time": 0.8, "rx": -25, "ry": 0, "rz": 0 }
+      ]
+    },
+    "right_arm": {
+      "keyframes": [
+        { "time": 0.0, "rx":  25, "ry": 0, "rz": 0 },
+        { "time": 0.4, "rx": -25, "ry": 0, "rz": 0 },
+        { "time": 0.8, "rx":  25, "ry": 0, "rz": 0 }
+      ]
+    }
+  }
+}
