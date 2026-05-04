@@ -1,5 +1,4 @@
 package org.example.comands.player;
-import net.minestom.server.entity.GameMode;
 
 public enum Gamemode {
     SURVIVAL(0),

@@ -1,17 +1,10 @@
 package org.example.comands.player;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.command.builder.suggestion.SuggestionEntry;
-import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
-import net.minestom.server.network.packet.client.play.ClientPlayerLoadedPacket;
-import net.minestom.server.network.packet.server.configuration.RegistryDataPacket;
-import net.minestom.server.network.packet.server.play.ChangeGameStatePacket;
-import net.minestom.server.network.packet.server.play.RespawnPacket;
 import org.example.api.zero_command.ZeroCommand;
 import org.example.extras.PlayerUtils;
 import org.example.extras.Utils;

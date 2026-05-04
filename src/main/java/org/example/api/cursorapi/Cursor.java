@@ -7,15 +7,10 @@ import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.metadata.display.TextDisplayMeta;
-import net.minestom.server.event.EventFilter;
-import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
-import net.minestom.server.event.trait.PlayerEvent;
-import net.minestom.server.network.packet.server.play.CameraPacket;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
-import org.example.Main;
 
 public class Cursor {
     private final Player player;

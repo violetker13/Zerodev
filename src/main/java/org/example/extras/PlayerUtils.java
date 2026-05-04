@@ -1,16 +1,8 @@
 package org.example.extras;
 
-import net.kyori.adventure.resource.ResourcePackInfo;
-import net.kyori.adventure.resource.ResourcePackRequest;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
-import org.example.Main;
 
-import java.net.URI;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 import static org.example.Main.ADMINS;
 import static org.example.Main.server;

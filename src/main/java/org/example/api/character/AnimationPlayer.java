@@ -1,4 +1,4 @@
-package org.example.api.blockbench.player;
+package org.example.api.character;
 
 /**
  * Воспроизводит Animation на PlayerSkeleton.
@@ -79,25 +79,29 @@ public class AnimationPlayer {
     private void apply(Animation anim, float t) {
         for (var entry : anim.tracks().entrySet()) {
             BoneNode bone = skeleton.getBone(entry.getKey());
-            if (bone != null) bone.localRot = entry.getValue().sample(t);
+            if (bone != null) bone.animRot = entry.getValue().sample(t);
+        }
+    }
+
+    private void applyToSkeleton(Animation anim, float t) {
+        for (var entry : anim.tracks().entrySet()) {
+            BoneNode bone = skeleton.getBone(entry.getKey());
+            if (bone != null) {
+                bone.animRot = entry.getValue().sample(t);  // ← animRot, не localRot
+            }
         }
     }
 
     private void applyBlended(float alpha) {
-        // Применяем текущую анимацию
         for (var entry : current.tracks().entrySet()) {
             BoneNode bone = skeleton.getBone(entry.getKey());
             if (bone == null) continue;
-
             Quat curr = entry.getValue().sample(time);
-
-            // Если blendFrom имеет трек для этой кости — смешиваем
-            BoneTrack fromTrack = blendFrom.getTrack(entry.getKey());
+            AnimationTrack fromTrack = blendFrom != null ? blendFrom.getTrack(entry.getKey()) : null;
             if (fromTrack != null) {
-                Quat prev = fromTrack.sample(blendFromTime);
-                bone.localRot = Quat.slerp(prev, curr, alpha);
+                bone.animRot = Quat.slerp(fromTrack.sample(blendFromTime), curr, alpha);
             } else {
-                bone.localRot = Quat.slerp(Quat.IDENTITY, curr, alpha);
+                bone.animRot = Quat.slerp(Quat.IDENTITY, curr, alpha);
             }
         }
     }

@@ -14,7 +14,6 @@ import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import org.example.comands.worldedit.WandCommand;
 import org.example.comands.worldedit.WorldEdit;
 import org.example.events.EventHandler;
 

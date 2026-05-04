@@ -4,13 +4,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.entity.Player;
-import net.minestom.server.entity.PlayerHand;
-import net.minestom.server.event.player.PlayerBlockBreakEvent;
-import net.minestom.server.event.player.PlayerBlockInteractEvent;
-import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import org.example.Main;
 import org.example.api.zero_command.ZeroCommand;
 
 public class WandCommand extends Command implements ZeroCommand {

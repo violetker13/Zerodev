@@ -1,9 +1,9 @@
-package org.example.api.blockbench.player;
+package org.example.api.character;
 
 import java.util.List;
 
 /** Трек ключевых кадров для одной кости. */
-public record BoneTrack(List<Keyframe> keyframes) {
+public record AnimationTrack(List<Keyframe> keyframes) {
 
     /** Интерполировать вращение в момент времени t */
     public Quat sample(float t) {

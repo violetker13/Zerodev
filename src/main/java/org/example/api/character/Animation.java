@@ -1,4 +1,4 @@
-package org.example.api.blockbench.player;
+package org.example.api.character;
 
 import java.util.Map;
 
@@ -14,7 +14,7 @@ public record Animation(
         String name,
         float  length,
         boolean loop,
-        Map<String, BoneTrack> tracks
+        Map<String, AnimationTrack> tracks
 ) {
-    public BoneTrack getTrack(String boneName) { return tracks.get(boneName); }
+    public AnimationTrack getTrack(String boneName) { return tracks.get(boneName); }
 }

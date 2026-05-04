@@ -1,5 +1,6 @@
 package org.example.comands.player;
 
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentEnum;
 import net.minestom.server.command.builder.arguments.ArgumentType;
@@ -7,9 +8,13 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
-import org.example.api.blockbench.player.Animation;
-import org.example.api.blockbench.player.AnimationLoader;
-import org.example.api.blockbench.player.PlayerBodyModel;
+import net.minestom.server.potion.PotionEffect;
+import net.minestom.server.timer.Task;
+import net.minestom.server.timer.TaskSchedule;
+import org.example.api.character.Animation;
+import org.example.api.character.AnimationLoader;
+import org.example.api.character.Characters;
+import org.example.api.character.PlayerBodyModel;
 import org.example.api.zero_command.ZeroCommand;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,7 +27,7 @@ public class newbody extends Command implements ZeroCommand {
 
     public enum BodyActions { ON, OFF }
 
-    // Текстура скина (замени на свою)
+    // Замени на свою текстуру
     private static final String TEXTURE =
             "eyJ0aW1lc3RhbXAiOjE2MjI1NTA1NDU3NzksInByb2ZpbGVJZCI6ImU2MWI0" +
                     "MmZjOTAzYTQ0MThhMTdhMTNkMDNmZjcxMmYiLCJwcm9maWxlTmFtZSI6Ik5v" +
@@ -30,27 +35,18 @@ public class newbody extends Command implements ZeroCommand {
                     "SU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4" +
                     "dHVyZS8yOTIwMDlhNDkyNWI1OGYwMmM3N2RhZGMyM2YwNjlhYTZiZWYzNTMz" +
                     "OTg3YzFlMzM1N2FkM2E0YzA4NzgzIn19fQ==";
+    private static final Map<UUID, PlayerBodyModel>                      bodies     = new HashMap<>();
+    private static final Map<UUID, Task>                                 tickTasks  = new HashMap<>();
+    private static final Map<UUID, EventListener<PlayerMoveEvent>>       moveList   = new HashMap<>();
+    private static final Map<UUID, EventListener<PlayerDisconnectEvent>> discList   = new HashMap<>();
+    private static final Animation WALK_ANIM = loadAnim("animations/walk.json");
+    private static final Animation IDLE_ANIM = loadAnim("animations/idle.json");
 
-    // uuid → модель тела
-    private static final Map<UUID, PlayerBodyModel> bodies = new HashMap<>();
-    // uuid → слушатели событий (для корректного удаления)
-    private static final Map<UUID, EventListener<PlayerMoveEvent>>       moveListeners = new HashMap<>();
-    private static final Map<UUID, EventListener<PlayerDisconnectEvent>> discListeners = new HashMap<>();
-
-    // Кэш анимаций (загружаем один раз)
-    private static Animation walkAnim;
-    private static Animation idleAnim;
-
-    static {
-        try {
-            walkAnim = AnimationLoader.load("animations/walk.json");
-        } catch (IOException e) {
-            System.err.println("[newbody] Не удалось загрузить walk.json: " + e.getMessage());
-        }
-        try {
-            idleAnim = AnimationLoader.load("animations/idle.json");
-        } catch (IOException e) {
-            System.err.println("[newbody] Не удалось загрузить idle.json (необязательно)");
+    private static Animation loadAnim(String path) {
+        try { return AnimationLoader.load(path); }
+        catch (IOException e) {
+            System.err.println("[newbody] Не удалось загрузить " + path);
+            return null;
         }
     }
 
@@ -58,8 +54,9 @@ public class newbody extends Command implements ZeroCommand {
         super("newbody");
         setUsage("/newbody <on|off>");
 
-        ArgumentEnum<@NotNull BodyActions> action = ArgumentType.Enum("action", BodyActions.class)
-                .setFormat(ArgumentEnum.Format.LOWER_CASED);
+        ArgumentEnum<@NotNull BodyActions> action =
+                ArgumentType.Enum("action", BodyActions.class)
+                        .setFormat(ArgumentEnum.Format.LOWER_CASED);
 
         addPlayerSyntax((player, context) -> {
             switch (context.get(action)) {
@@ -68,59 +65,52 @@ public class newbody extends Command implements ZeroCommand {
             }
         }, action);
     }
+    private void activate(@NotNull Player player) {
+        UUID uuid = player.getUuid();
+        if (bodies.containsKey(uuid)) { sendError(player, "newbody уже активен!"); return; }// 1. Делаем игрока невидимы
+        PlayerBodyModel body = new PlayerBodyModel(Characters.SAITAMA, TEXTURE);
+        body.spawn(player.getInstance(), player.getPosition(),player);
+        bodies.put(uuid, body);
+        player.getPlayerMeta().setInvisible(true);
 
-    // ── Активация ────────────────────────────────────────────────────────────
+        // Запускаем idle если есть
+        if (IDLE_ANIM != null) body.getAnimationPlayer().play(IDLE_ANIM);
 
-    private void activate(Player player) {
-        if (bodies.containsKey(player.getUuid())) {
-            sendError(player, "newbody уже активен!");
-            return;
-        }
+        // 3. Тик каждые 50 мс — обновляет ориентацию + анимацию
+        Task task = MinecraftServer.getSchedulerManager()
+                .buildTask(() -> {
+                    if (!player.isOnline()) { deactivate(player); return; }
+                    PlayerBodyModel b = bodies.get(uuid);
+                    if (b != null) b.tick(0.05f, player.getPosition());
+                })
+                .repeat(TaskSchedule.tick(1))
+                .schedule();
+        tickTasks.put(uuid, task);
 
-        // Создаём модель
-        PlayerBodyModel body = new PlayerBodyModel(TEXTURE);
-        body.spawn(player.getInstance(), player.getPosition());
-        body.startAutoTick();
-
-        // Запускаем idle-анимацию если есть
-        if (idleAnim != null) {
-            body.getAnimationPlayer().play(idleAnim);
-        }
-
-        bodies.put(player.getUuid(), body);
-
-        // ── Движение: двигаем тело + меняем анимацию ────────────────────────
-        EventListener<PlayerMoveEvent> moveListener = EventListener
-                .builder(PlayerMoveEvent.class)
+        // 4. PlayerMoveEvent — для смены анимаций walk/idle
+        EventListener<PlayerMoveEvent> ml = EventListener.builder(PlayerMoveEvent.class)
                 .handler(event -> {
-                    PlayerBodyModel b = bodies.get(player.getUuid());
+                    PlayerBodyModel b = bodies.get(uuid);
                     if (b == null) return;
 
-                    b.teleport(event.getNewPosition());
+                    boolean isWalking = isMovingHorizontally(event);
+                    Animation target  = isWalking ? WALK_ANIM : IDLE_ANIM;
 
-                    // Смена анимации: идём/стоим
-                    boolean moving = isMoving(event);
-                    Animation target = moving ? walkAnim : idleAnim;
-                    if (target != null) {
-                        Animation current = b.getAnimationPlayer().getCurrent();
-                        if (current != target) {
-                            b.getAnimationPlayer().play(target, 0.15f); // плавный переход 0.15 сек
-                        }
+                    if (target != null && b.getAnimationPlayer().getCurrent() != target) {
+                        b.getAnimationPlayer().play(target, 0.15f);
                     }
                 })
                 .build();
 
-        // ── Отключение: убираем тело автоматически ──────────────────────────
-        EventListener<PlayerDisconnectEvent> discListener = EventListener
-                .builder(PlayerDisconnectEvent.class)
-                .handler(event -> deactivate(player))
+        // 5. Авто-удаление при дисконнекте
+        EventListener<PlayerDisconnectEvent> dl = EventListener.builder(PlayerDisconnectEvent.class)
+                .handler(e -> deactivate(player))
                 .build();
 
-        player.eventNode().addListener(moveListener);
-        player.eventNode().addListener(discListener);
-
-        moveListeners.put(player.getUuid(), moveListener);
-        discListeners.put(player.getUuid(), discListener);
+        player.eventNode().addListener(ml);
+        player.eventNode().addListener(dl);
+        moveList.put(uuid, ml);
+        discList.put(uuid, dl);
 
         player.sendMessage("§aNewBody включён!");
     }
@@ -129,17 +119,23 @@ public class newbody extends Command implements ZeroCommand {
 
     private void deactivate(Player player) {
         UUID uuid = player.getUuid();
+        player.getPlayerMeta().setInvisible(false);
 
         PlayerBodyModel body = bodies.remove(uuid);
-        if (body == null) {
-            sendError(player, "newbody не активен!");
-            return;
-        }
+        if (body == null) { sendError(player, "Newbody не активен!"); return; }
+
+        // Удаляем тело
         body.remove();
 
+        // Снимаем невидимость
+
+        // Останавливаем тик
+        Task t = tickTasks.remove(uuid);
+        if (t != null) t.cancel();
+
         // Убираем слушатели
-        EventListener<PlayerMoveEvent> ml = moveListeners.remove(uuid);
-        EventListener<PlayerDisconnectEvent> dl = discListeners.remove(uuid);
+        EventListener<PlayerMoveEvent> ml = moveList.remove(uuid);
+        EventListener<PlayerDisconnectEvent> dl = discList.remove(uuid);
         if (ml != null) player.eventNode().removeListener(ml);
         if (dl != null) player.eventNode().removeListener(dl);
 
@@ -148,15 +144,11 @@ public class newbody extends Command implements ZeroCommand {
 
     // ── Утилиты ──────────────────────────────────────────────────────────────
 
-    /** Игрок двигается горизонтально? */
-    private boolean isMoving(PlayerMoveEvent event) {
-        var np = event.getNewPosition();
-        var op = event.getPlayer().getPosition();
-        double dx = np.x() - op.x();
-        double dz = np.z() - op.z();
-        return dx*dx + dz*dz > 1e-6;
+    private boolean isMovingHorizontally(PlayerMoveEvent e) {
+        double dx = e.getNewPosition().x() - e.getPlayer().getPosition().x();
+        double dz = e.getNewPosition().z() - e.getPlayer().getPosition().z();
+        return (dx*dx + dz*dz) > 1e-6;
     }
 
-    @Override
-    public Command getCommand() { return this; }
+    @Override public Command getCommand() { return this; }
 }

@@ -11,7 +11,7 @@ import net.minestom.server.instance.InstanceContainer;
 import org.example.events.EventHandler;
 
 import static org.example.extras.PlayerUtils.getAllPlayers;
-import static org.example.extras.ResourcePack.LoadResourcePack;
+import static org.example.extras.extra.ResourcePack.LoadResourcePack;
 
 public class AsyncPlayerConfigurationHandler extends EventHandler {
     @Override

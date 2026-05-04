@@ -3,7 +3,6 @@ package org.example.comands.player;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentEnum;
 import net.minestom.server.command.builder.arguments.ArgumentType;
-import net.minestom.server.command.builder.arguments.number.ArgumentInteger;
 import net.minestom.server.command.builder.arguments.number.ArgumentNumber;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;

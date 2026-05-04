@@ -19,7 +19,7 @@ application {
 dependencies {
     implementation('net.minestom:minestom:2026.04.13-1.21.11')
     implementation("dev.lu15:spark-minestom:1.10-SNAPSHOT")
-
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
     implementation 'de.articdive:jnoise-pipeline:4.0.0'
     implementation 'org.reflections:reflections:0.10.2'
     implementation 'org.xerial:sqlite-jdbc:3.45.2.0'

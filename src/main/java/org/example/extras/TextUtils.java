@@ -5,8 +5,6 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 
-import javax.annotation.Nullable;
-
 public class TextUtils {
     public static Component ColorizeText(String text) {
         if (text == null || text.isEmpty()) return Component.empty();

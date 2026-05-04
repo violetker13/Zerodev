@@ -1,11 +1,9 @@
-package org.example.extras;
+package org.example.extras.extra;
 
 import com.sun.net.httpserver.HttpServer;
 import net.kyori.adventure.resource.ResourcePackInfo;
 import net.kyori.adventure.resource.ResourcePackRequest;
 import net.minestom.server.entity.Player;
-import org.example.Main;
-import org.reflections.vfs.ZipDir;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;

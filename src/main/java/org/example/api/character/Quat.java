@@ -1,4 +1,6 @@
-package org.example.api.blockbench.player;
+package org.example.api.character;
+
+import java.util.Arrays;
 
 /**
  * Иммутабельный кватернион для вращений костей.
@@ -13,7 +15,6 @@ public final class Quat {
     public Quat(float x, float y, float z, float w) {
         this.x = x; this.y = y; this.z = z; this.w = w;
     }
-
     /** Из углов Эйлера XYZ в градусах (порядок: pitch, yaw, roll) */
     public static Quat fromEulerDeg(float rx, float ry, float rz) {
         double cx = Math.cos(Math.toRadians(rx * 0.5));

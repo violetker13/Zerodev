@@ -1,8 +1,5 @@
 package org.example.events.global;
 
-import com.sun.management.OperatingSystemMXBean;
-import com.sun.net.httpserver.Request;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.server.ServerTickMonitorEvent;
@@ -10,10 +7,6 @@ import net.minestom.server.instance.InstanceContainer;
 import org.example.events.EventHandler;
 import org.example.extras.PlayerUtils;
 import org.example.extras.Utils;
-
-import java.awt.*;
-import java.io.IOException;
-import java.net.Socket;
 
 import static org.example.world.InstanceManager.getIdByInstance;
 public class ServerTickMonitorEventHandler extends EventHandler {

@@ -1,4 +1,4 @@
-package org.example.api.blockbench.player;
+package org.example.api.character;
 
 import com.google.gson.*;
 
@@ -53,7 +53,7 @@ public class AnimationLoader {
         float   length = obj.get("length").getAsFloat();
         boolean loop   = obj.has("loop") && obj.get("loop").getAsBoolean();
 
-        Map<String, BoneTrack> tracks = new HashMap<>();
+        Map<String, AnimationTrack> tracks = new HashMap<>();
 
         JsonObject bonesObj = obj.getAsJsonObject("bones");
         if (bonesObj != null) {
@@ -70,7 +70,7 @@ public class AnimationLoader {
                     ));
                 }
                 kfList.sort(Comparator.comparingDouble(Keyframe::time));
-                tracks.put(e.getKey(), new BoneTrack(kfList));
+                tracks.put(e.getKey(), new AnimationTrack(kfList));
             }
         }
 

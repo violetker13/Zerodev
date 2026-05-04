@@ -10,7 +10,6 @@ import net.minestom.server.command.builder.suggestion.SuggestionEntry;
 import net.minestom.server.entity.Player;
 import org.example.extras.PlayerUtils;
 
-import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.function.BiConsumer;
 

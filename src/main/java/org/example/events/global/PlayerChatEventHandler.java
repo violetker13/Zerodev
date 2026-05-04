@@ -1,13 +1,10 @@
 package org.example.events.global;
 
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.PlayerChatEvent;
 import net.minestom.server.instance.InstanceContainer;
-import net.minestom.server.timer.Schedulable;
 import org.example.events.EventHandler;
-import org.example.extras.PlayerUtils;
 import org.example.extras.Utils;
 import org.example.world.InstanceManager;
 

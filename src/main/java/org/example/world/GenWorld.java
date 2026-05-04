@@ -1,13 +1,8 @@
 package org.example.world;
 
-import net.minestom.server.coordinate.ChunkRange;
-import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.LightingChunk;
 import net.minestom.server.instance.block.Block;
-
-import java.util.ArrayList;
-import java.util.concurrent.CompletableFuture;
 
 public class GenWorld {
    public static void init(InstanceContainer instance){

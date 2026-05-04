@@ -7,7 +7,6 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.metadata.display.TextDisplayMeta;
-import net.minestom.server.network.packet.PacketRegistry;
 import org.example.api.blockbench.ObjLoader;
 import org.example.api.blockbench.VertexBuffer;
 import org.example.api.zero_command.ZeroCommand;

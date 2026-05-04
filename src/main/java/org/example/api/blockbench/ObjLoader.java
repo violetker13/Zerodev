@@ -2,7 +2,6 @@ package org.example.api.blockbench;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.nio.file.Path;
 import java.util.Scanner;
 public class ObjLoader {

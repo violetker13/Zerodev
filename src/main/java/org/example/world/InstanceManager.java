@@ -11,11 +11,8 @@ import net.minestom.server.instance.anvil.AnvilLoader;
 import org.example.Main;
 import org.example.extras.AutoRegister;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.example.world.GenWorld.light;
 
 public class InstanceManager {
 
